@@ -4,7 +4,8 @@
  * console's hidden SSID with the derived CCMP key (no 4-way handshake), then
  * run the LDN authentication. Repeats until authenticated.
  *
- * Logs go to the USB-Serial/JTAG console (native USB on the Mac).
+ * Logs go to the console: USB-Serial/JTAG on ESP32-S3, ROM USB CDC on ESP32-S2
+ * (see sdkconfig.defaults / sdkconfig.defaults.esp32s2).
  */
 #include <stdio.h>
 #include <string.h>

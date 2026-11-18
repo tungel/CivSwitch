@@ -1,0 +1,46 @@
+# ESP32-S2 build of esp32-ldn-civ7 (Wemos/LOLIN S2 Mini, ESP32-S2FN4R2: 4 MB flash, 2 MB PSRAM).
+# Used by: tools/build_and_flash.py --target esp32s2 (see sdkconfig.defaults for the S3 build).
+
+CONFIG_IDF_TARGET="esp32s2"
+CONFIG_IDF_TARGET_ESP32S2=y
+
+# S2 has no USB-Serial/JTAG. The S2 Mini has no USB-UART bridge either: its USB-C is the chip's
+# native USB, so the console rides the ROM USB CDC stack.
+CONFIG_ESP_CONSOLE_USB_CDC=y
+CONFIG_ESP_CONSOLE_UART_DEFAULT=n
+CONFIG_ESP_CONSOLE_SECONDARY_NONE=y
+
+# 4 MB module; the S3 partition map already ends at 0x310000, so partitions.csv is reused as-is.
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHMODE_DIO=y
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ_240=y
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+
+# ---- pokeldn radio settings (association reliability) ----
+CONFIG_ESP_WIFI_SOFTAP_SUPPORT=y
+CONFIG_ESP_WIFI_ENABLE_WPA3_SAE=n
+CONFIG_ESP_WIFI_NVS_ENABLED=n
+CONFIG_ESP_WIFI_AMPDU_TX_ENABLED=n
+CONFIG_ESP_WIFI_AMPDU_RX_ENABLED=n
+# S2 is single core with less internal RAM than the S3: pokeldn's S2 image uses 10 static RX buffers
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=10
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=64
+CONFIG_ESP_WIFI_DYNAMIC_TX_BUFFER_NUM=64
+CONFIG_FREERTOS_HZ=1000
+CONFIG_ESP_TASK_WDT_EN=n
+
+# Internal heap after this app is ~49 KB on S2 (S3: ~232 KB). The dynamic RX/TX pools allocate on
+# demand, so a beacon burst can want far more than that; give them the module's in-package PSRAM
+# (S2 PSRAM is DMA capable). IGNORE_NOTFOUND keeps PSRAM-less modules (ESP32-S2FH4) booting, but on
+# those drop both DYNAMIC_*_BUFFER_NUM values to 16.
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_IGNORE_NOTFOUND=y
+CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=256
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=32768
+CONFIG_SPIRAM_SPEED_80M=y
+

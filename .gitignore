@@ -22,3 +22,7 @@ esp32-ldn-civ7/sdkconfig.old
 esp32-ldn-civ7/managed_components/
 esp32-ldn-civ7/dependencies.lock
 prod.keys
+esp32-ldn-civ7/build-*/
+
+# prebuilt flash images embed derived key material
+releases/
